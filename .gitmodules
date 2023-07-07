@@ -1,0 +1,6 @@
+[submodule "third_party/libheif"]
+	path = third_party/libheif
+	url = https://github.com/strukturag/libheif.git
+[submodule "third_party/libde265"]
+	path = third_party/libde265
+	url = https://github.com/strukturag/libde265.git
