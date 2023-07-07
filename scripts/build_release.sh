@@ -22,4 +22,7 @@ emcc -Wl,--whole-archive build/libheif/libheif/libheif.a -Wl,--no-whole-archive 
     -sALLOW_MEMORY_GROWTH=1 \
     -sMAXIMUM_MEMORY=128MB \
     -sDISABLE_EXCEPTION_CATCHING=1 \
+    -sMODULARIZE \
     -o build/libheif.js || exit 1
+cp build/libheif.js src/libheif.js
+cp build/libheif.wasm src/libheif.wasm
