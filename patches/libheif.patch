@@ -1,0 +1,13 @@
+diff --git a/libheif/heif_emscripten.h b/libheif/heif_emscripten.h
+index 56e4180..6d8641a 100644
+--- a/libheif/heif_emscripten.h
++++ b/libheif/heif_emscripten.h
+@@ -161,7 +161,7 @@ static emscripten::val heif_js_decode_image(struct heif_image_handle* handle,
+       // Should never reach here.
+       break;
+   }
+-  result.set("data", std::move(data));
++  result.set("data", emscripten::typed_memory_view(data.size(), reinterpret_cast<const unsigned char*>(data.data())));
+   heif_image_release(image);
+   return result;
+ }

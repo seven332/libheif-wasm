@@ -28,11 +28,14 @@ cmake --build ${LIBDE265_BUILD_DIR} --target libde265.a
 cp ${LIBDE265_BUILD_DIR}/libde265/de265-version.h ${LIBDE265_SOURCE_DIR}/libde265
 
 # Build libheif
+git -C ${LIBHEIF_SOURCE_DIR} checkout -f
+git -C ${LIBHEIF_SOURCE_DIR} apply ../../patches/libheif.patch
 emcmake cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G Ninja -S ${LIBHEIF_SOURCE_DIR} -B ${LIBHEIF_BUILD_DIR} \
     -DENABLE_MULTITHREADING_SUPPORT=OFF -DWITH_GDK_PIXBUF=OFF -DWITH_EXAMPLES=OFF \
     -DLIBDE265_INCLUDE_DIR="${LIBDE265_SOURCE_DIR}" \
     -DLIBDE265_LIBRARY="-L${LIBDE265_BUILD_DIR}/libde265"
 cmake --build ${LIBHEIF_BUILD_DIR} --target libheif.a
+git -C ${LIBHEIF_SOURCE_DIR} checkout -f
 
 # Build wasm
 emcc -Wl,--whole-archive ${LIBHEIF_BUILD_DIR}/libheif/libheif.a -Wl,--no-whole-archive \
