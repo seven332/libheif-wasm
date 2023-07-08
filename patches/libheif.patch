@@ -11,3 +11,21 @@ index 56e4180..6d8641a 100644
    heif_image_release(image);
    return result;
  }
+diff --git a/libheif/plugins/decoder_dav1d.cc b/libheif/plugins/decoder_dav1d.cc
+index f60d2ec..1d623ed 100644
+--- a/libheif/plugins/decoder_dav1d.cc
++++ b/libheif/plugins/decoder_dav1d.cc
+@@ -95,7 +95,12 @@ struct heif_error dav1d_new_decoder(void** dec)
+ 
+   dav1d_default_settings(&decoder->settings);
+ 
+-  decoder->settings.frame_size_limit = MAX_IMAGE_WIDTH * MAX_IMAGE_HEIGHT;
++  // set frame_size_limit to 8192 * 8192 to keep dav1d silent
++  if (sizeof(size_t) < 8) {
++    decoder->settings.frame_size_limit = 8192 * 8192;
++  } else {
++    decoder->settings.frame_size_limit = MAX_IMAGE_WIDTH * MAX_IMAGE_HEIGHT;
++  }
+   decoder->settings.all_layers = 0;
+ 
+   if (dav1d_open(&decoder->context, &decoder->settings) != 0) {
