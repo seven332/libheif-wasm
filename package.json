@@ -4,7 +4,8 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "build-wasm": "./scripts/build_release.sh",
+    "build-wasm-debug": "./scripts/build_wasm.sh debug",
+    "build-wasm-release": "./scripts/build_wasm.sh release",
     "test": "jest"
   },
   "author": "seven332",
