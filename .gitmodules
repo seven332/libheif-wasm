@@ -7,3 +7,6 @@
 [submodule "third_party/dav1d"]
 	path = third_party/dav1d
 	url = https://code.videolan.org/videolan/dav1d.git
+[submodule "third_party/avif-sample-images"]
+	path = third_party/avif-sample-images
+	url = https://github.com/link-u/avif-sample-images.git
