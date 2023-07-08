@@ -74,7 +74,7 @@ describe("libheif", () => {
       );
       expect(image.data.length).toEqual(1639680);
 
-      libheif.heif_image_handle_release(handle)
+      libheif.heif_image_handle_release(handle);
     }
 
     // image 1
@@ -100,7 +100,7 @@ describe("libheif", () => {
       );
       expect(image.data.length).toEqual(1639680);
 
-      libheif.heif_image_handle_release(handle)
+      libheif.heif_image_handle_release(handle);
     }
 
     libheif.heif_context_free(ctx);
