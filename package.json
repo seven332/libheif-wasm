@@ -4,6 +4,7 @@
   "description": "",
   "type": "module",
   "scripts": {
+    "build": "tsc",
     "build-wasm-debug": "./tools/build_wasm.sh debug",
     "build-wasm-release": "./tools/build_wasm.sh release",
     "test": "jest"
