@@ -16,12 +16,14 @@
   "scripts": {
     "build-wasm-debug": "./tools/build_wasm.sh debug",
     "build-wasm-release": "./tools/build_wasm.sh release",
-    "build": "tsc && cp src/libheif.js src/libheif.wasm dist",
-    "test": "jest",
+    "build-wasm-release-es6": "./tools/build_wasm.sh release es6",
+    "dev-debug": "npm run build-wasm-debug && cp build/debug/libheif.js build/debug/libheif.wasm src",
+    "dev-release": "npm run build-wasm-release && cp build/release/libheif.js build/release/libheif.wasm src",
+    "build": "npm run build-wasm-release-es6 && tsc && cp build/release/libheif.js build/release/libheif.wasm dist",
     "clean": "rm -rf build dist",
-    "clean-build": "npm run clean && npm run build-wasm-release && npm run build",
-    "prepublishOnly": "npm run clean-build && npm test",
-    "build-demo": "npm run build && cp dist/index.js dist/libheif.js dist/libheif.wasm demo"
+    "test": "jest",
+    "prepublishOnly": "npm run clean && npm run build && npm test",
+    "demo": "npm run build && cp dist/index.js dist/libheif.js dist/libheif.wasm demo"
   },
   "keywords": [
     "heif",

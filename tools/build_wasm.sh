@@ -24,6 +24,12 @@ else
     echo "Unknown build type: ${BUILD_TYPE}"
 fi
 
+if [ $2 == "es6" ]; then
+    LINK_ES6="-sEXPORT_ES6"
+else
+    LINK_ES6=""
+fi
+
 # Build libde265
 emcmake cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G Ninja -S ${LIBDE265_SOURCE_DIR} -B ${LIBDE265_BUILD_DIR}
 cmake --build ${LIBDE265_BUILD_DIR} --target libde265.a
@@ -58,7 +64,6 @@ emcc -Wl,--whole-archive ${LIBHEIF_BUILD_DIR}/libheif/libheif.a -Wl,--no-whole-a
     -sMAXIMUM_MEMORY=512MB \
     -sDISABLE_EXCEPTION_CATCHING=1 \
     -sMODULARIZE \
+    ${LINK_ES6} \
     -O${LINK_OPTIMIZATIONS} \
     -o ${BUILD_DIR}/libheif.js
-cp ${BUILD_DIR}/libheif.js src/libheif.js
-cp ${BUILD_DIR}/libheif.wasm src/libheif.wasm

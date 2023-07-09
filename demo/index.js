@@ -74,62 +74,31 @@ export class HeifDecoder {
     }
     decode(id) {
         const handle = this.checkHeifError(this.libheif.heif_js_context_get_image_handle(this.ctx, id));
-        const image = this.checkHeifError(this.libheif.heif_js_decode_image(handle, this.libheif.heif_colorspace.heif_colorspace_YCbCr, this.libheif.heif_chroma.heif_chroma_420));
+        const image = this.checkHeifError(this.libheif.heif_js_decode_image_rgba(handle));
+        const heifImage = {
+            width: image.width,
+            height: image.height,
+            data: this.stridedCopy(image.plane, image.width * 4, image.height, image.stride),
+        };
+        this.libheif.heif_image_release(image.ptr);
         this.libheif.heif_image_handle_release(handle);
-        return this.convert(image);
+        return heifImage;
     }
-    convert(image) {
-        // Algorithm from libheif post.js
-        const w = image.width;
-        const h = image.height;
-        const dest = new Uint8Array(w * h * 4);
-        const stridey = w;
-        const strideu = Math.ceil(w / 2);
-        const stridev = Math.ceil(w / 2);
-        const h2 = Math.ceil(h / 2);
-        const y = image.data;
-        const u = image.data.subarray(stridey * h, stridey * h + strideu * h2);
-        const v = image.data.subarray(stridey * h + strideu * h2, stridey * h + strideu * h2 + stridev * h2);
-        let xpos = 0;
-        let ypos = 0;
-        let yoffset = 0;
-        let uoffset = 0;
-        let voffset = 0;
-        let i = 0;
-        const maxi = w * h;
-        while (i < maxi) {
-            const x2 = xpos >> 1;
-            let yval = 1.164 * (y[yoffset + xpos] - 16);
-            const uval = u[uoffset + x2] - 128;
-            const vval = v[voffset + x2] - 128;
-            dest[(i << 2) + 0] = yval + 1.596 * vval;
-            dest[(i << 2) + 1] = yval - 0.813 * vval - 0.391 * uval;
-            dest[(i << 2) + 2] = yval + 2.018 * uval;
-            dest[(i << 2) + 3] = 0xff;
-            i++;
-            xpos++;
-            if (xpos < w) {
-                yval = 1.164 * (y[yoffset + xpos] - 16);
-                dest[(i << 2) + 0] = yval + 1.596 * vval;
-                dest[(i << 2) + 1] = yval - 0.813 * vval - 0.391 * uval;
-                dest[(i << 2) + 2] = yval + 2.018 * uval;
-                dest[(i << 2) + 3] = 0xff;
-                i++;
-                xpos++;
-            }
-            if (xpos === w) {
-                xpos = 0;
-                ypos++;
-                yoffset += stridey;
-                uoffset = (ypos >> 1) * strideu;
-                voffset = (ypos >> 1) * stridev;
+    stridedCopy(src, width, height, stride) {
+        const dst = new Uint8Array(width * height);
+        if (width == stride) {
+            dst.set(src);
+        }
+        else {
+            let dstOffset = 0;
+            let srcOffset = 0;
+            for (let y = 0; y < height; ++y) {
+                dst.set(src.subarray(srcOffset, srcOffset + width), dstOffset);
+                dstOffset += width;
+                srcOffset += stride;
             }
         }
-        return {
-            width: w,
-            height: h,
-            data: dest,
-        };
+        return dst;
     }
     /**
      * Releases this decoder.
