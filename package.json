@@ -22,7 +22,7 @@
     "build": "npm run build-wasm-release-es6 && tsc && cp build/release/libheif.js build/release/libheif.wasm dist",
     "clean": "rm -rf build dist",
     "test": "jest",
-    "prepublishOnly": "npm run clean && npm run build && npm test",
+    "prepublishOnly": "npm run clean && npm run dev-debug && npm test && npm run clean && npm run build",
     "demo": "npm run build && cp dist/index.js dist/libheif.js dist/libheif.wasm demo"
   },
   "keywords": [
