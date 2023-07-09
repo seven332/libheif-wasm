@@ -81,27 +81,6 @@ export enum heif_suberror_code {
   heif_suberror_Cannot_read_plugin_directory = 6002,
 }
 
-export enum heif_colorspace {
-  heif_colorspace_undefined = 99,
-  heif_colorspace_YCbCr = 0,
-  heif_colorspace_RGB = 1,
-  heif_colorspace_monochrome = 2,
-}
-
-export enum heif_chroma {
-  heif_chroma_undefined = 99,
-  heif_chroma_monochrome = 0,
-  heif_chroma_420 = 1,
-  heif_chroma_422 = 2,
-  heif_chroma_444 = 3,
-  heif_chroma_interleaved_RGB = 10,
-  heif_chroma_interleaved_RGBA = 11,
-  heif_chroma_interleaved_RRGGBB_BE = 12,
-  heif_chroma_interleaved_RRGGBBAA_BE = 13,
-  heif_chroma_interleaved_RRGGBB_LE = 14,
-  heif_chroma_interleaved_RRGGBBAA_LE = 15,
-}
-
 export class heif_context {
   private constructor();
 }
@@ -117,21 +96,23 @@ export class heif_image_handle {
   private constructor();
 }
 
+export class heif_image_ptr {
+  private constructor();
+}
+
 export interface heif_image {
   is_primary: number;
   thumbnails: number;
   width: number;
   height: number;
-  chroma: heif_chroma;
-  colorspace: heif_colorspace;
-  data: Uint8Array;
+  stride: number;
+  plane: Uint8Array;
+  ptr: heif_image_ptr;
 }
 
 export declare interface libheif {
   heif_error_code: typeof heif_error_code;
   heif_suberror_code: typeof heif_suberror_code;
-  heif_colorspace: typeof heif_colorspace;
-  heif_chroma: typeof heif_chroma;
 
   heif_get_version(): string;
   heif_get_version_number(): number;
@@ -149,10 +130,7 @@ export declare interface libheif {
     ctx: heif_context,
     id: heif_item_id
   ): heif_image_handle | heif_error;
-  heif_js_decode_image(
-    handle: heif_image_handle,
-    colorspace: heif_colorspace,
-    chroma: heif_chroma
-  ): heif_image | heif_error;
+  heif_js_decode_image_rgba(handle: heif_image_handle): heif_image | heif_error;
+  heif_image_release(ptr: heif_image_ptr): void;
   heif_image_handle_release(handle: heif_image_handle): void;
 }

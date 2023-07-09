@@ -58,21 +58,16 @@ describe("libheif", () => {
         itemIds[0]
       ) as heif_image_handle;
 
-      const image = libheif.heif_js_decode_image(
-        handle,
-        libheif.heif_colorspace.heif_colorspace_YCbCr,
-        libheif.heif_chroma.heif_chroma_420
-      ) as heif_image;
+      const image = libheif.heif_js_decode_image_rgba(handle) as heif_image;
 
       expect(image.is_primary).toBe(1);
       expect(image.thumbnails).toBe(1);
       expect(image.width).toBe(1280);
       expect(image.height).toBe(854);
-      expect(image.chroma).toBe(libheif.heif_chroma.heif_chroma_420);
-      expect(image.colorspace).toBe(
-        libheif.heif_colorspace.heif_colorspace_YCbCr
-      );
-      expect(image.data.length).toEqual(1639680);
+      expect(image.stride).toEqual(image.width * 4);
+      expect(image.plane.length).toEqual(image.width * 4 * image.height);
+
+      libheif.heif_image_release(image.ptr);
 
       libheif.heif_image_handle_release(handle);
     }
@@ -84,21 +79,16 @@ describe("libheif", () => {
         itemIds[1]
       ) as heif_image_handle;
 
-      const image = libheif.heif_js_decode_image(
-        handle,
-        libheif.heif_colorspace.heif_colorspace_YCbCr,
-        libheif.heif_chroma.heif_chroma_420
-      ) as heif_image;
+      const image = libheif.heif_js_decode_image_rgba(handle) as heif_image;
 
       expect(image.is_primary).toBe(0);
       expect(image.thumbnails).toBe(1);
       expect(image.width).toBe(1280);
       expect(image.height).toBe(854);
-      expect(image.chroma).toBe(libheif.heif_chroma.heif_chroma_420);
-      expect(image.colorspace).toBe(
-        libheif.heif_colorspace.heif_colorspace_YCbCr
-      );
-      expect(image.data.length).toEqual(1639680);
+      expect(image.stride).toEqual(image.width * 4);
+      expect(image.plane.length).toEqual(image.width * 4 * image.height);
+
+      libheif.heif_image_release(image.ptr);
 
       libheif.heif_image_handle_release(handle);
     }
