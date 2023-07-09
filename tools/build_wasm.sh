@@ -24,7 +24,7 @@ else
     echo "Unknown build type: ${BUILD_TYPE}"
 fi
 
-if [ $2 == "es6" ]; then
+if [ "$2" == "es6" ]; then
     LINK_ES6="-sEXPORT_ES6"
 else
     LINK_ES6=""
