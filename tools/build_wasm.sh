@@ -58,6 +58,7 @@ emcc -Wl,--whole-archive ${LIBHEIF_BUILD_DIR}/libheif/libheif.a -Wl,--no-whole-a
     -sMAXIMUM_MEMORY=512MB \
     -sDISABLE_EXCEPTION_CATCHING=1 \
     -sMODULARIZE \
+    -sEXPORT_ES6 \
     -O${LINK_OPTIMIZATIONS} \
     -o ${BUILD_DIR}/libheif.js
 cp ${BUILD_DIR}/libheif.js src/libheif.js
