@@ -4,7 +4,7 @@ import init, {
   heif_image,
   heif_item_id,
   libheif,
-} from "./libheif";
+} from "./libheif.js";
 
 export interface HeifImage {
   width: number;
@@ -39,10 +39,7 @@ export class HeifDecoder {
     return new HeifDecoder(libheif, ctx);
   }
 
-  private constructor(
-    private libheif: libheif,
-    private ctx: heif_context
-  ) {}
+  private constructor(private libheif: libheif, private ctx: heif_context) {}
 
   /**
    * Returns the number of images.

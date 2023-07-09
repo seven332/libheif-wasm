@@ -6,5 +6,46 @@
   </head>
   <body>
     <h1>libheif-wasm</h1>
+    <label>Choose a heif file:</label>
+    <input
+      type="file"
+      id="input"
+      accept=".heif,.heifs,.heic,.heics,.avci,.avcs,.avif"
+    />
+    <div id="container"></div>
+    <script type="module">
+      import { HeifDecoder } from "./index.js";
+      /** @type {HTMLDivElement} */
+      const container = document.getElementById("container");
+      /** @type {HTMLInputElement} */
+      const input = document.getElementById("input");
+      input.addEventListener("change", async () => {
+        if (input.files.length < 1) {
+          return;
+        }
+        container.innerHTML = "";
+        const file = input.files[0];
+        const buffer = await file.arrayBuffer();
+        try {
+          const decoder = await HeifDecoder.from(buffer);
+          const images = decoder.decodeAllImages();
+          decoder.release();
+          for (const image of images) {
+            const canvas = document.createElement("canvas");
+            canvas.width = image.width;
+            canvas.height = image.height;
+            const context = canvas.getContext("2d");
+            const imageData = new ImageData(image.width, image.height);
+            imageData.data.set(image.data);
+            context.putImageData(imageData, 0, 0);
+            container.appendChild(canvas);
+          }
+        } catch (e) {
+          const error = document.createElement("label");
+          error.innerHTML = e.message;
+          container.appendChild(error);
+        }
+      });
+    </script>
   </body>
 </html>
