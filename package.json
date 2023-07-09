@@ -1,14 +1,29 @@
 {
   "name": "libheif-wasm",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.1.0",
+  "description": "A WebAssembly implementation of heif decoder",
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc",
     "build-wasm-debug": "./tools/build_wasm.sh debug",
     "build-wasm-release": "./tools/build_wasm.sh release",
-    "test": "jest"
+    "build": "tsc && cp src/libheif.js dist && cp src/libheif.wasm dist",
+    "test": "jest",
+    "clean": "rm -rf build dist",
+    "prepare" : "npm run clean && npm run build-wasm-release && npm run build",
+    "prepublishOnly" : "npm test",
+    "postversion" : "git push && git push --tags"
   },
+  "keywords": [
+    "heif",
+    "heic",
+    "avif",
+    "wasm"
+  ],
   "author": "seven332",
   "license": "MIT",
   "devDependencies": {
