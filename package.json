@@ -14,17 +14,16 @@
     "dist"
   ],
   "scripts": {
-    "build-wasm-debug": "./tools/build_wasm.sh debug",
-    "build-wasm-release": "./tools/build_wasm.sh release",
-    "build-wasm-debug-es6": "./tools/build_wasm.sh debug es6",
-    "build-wasm-release-es6": "./tools/build_wasm.sh release es6",
-    "dev-debug": "npm run build-wasm-debug && cp build/debug/libheif.js build/debug/libheif.wasm src",
-    "dev-release": "npm run build-wasm-release && cp build/release/libheif.js build/release/libheif.wasm src",
-    "build": "npm run build-wasm-release && tsc && cp build/release/libheif.js build/release/libheif.wasm dist",
-    "build-es6": "npm run build-wasm-release-es6 && tsc -p tsconfig.es6.json && cp build/release/libheif.js build/release/libheif.wasm dist",
-    "clean": "rm -rf build dist",
+    "copy-wasm-debug": "cp build/debug/libheif.js build/debug/libheif.wasm src",
+    "copy-wasm-release": "cp build/release/libheif.js build/release/libheif.wasm src",
+    "build-wasm-debug": "./tools/build_wasm.sh debug && npm run copy-wasm-debug",
+    "build-wasm-release": "./tools/build_wasm.sh release && npm run copy-wasm-release",
+    "build-wasm-debug-es6": "./tools/build_wasm.sh debug es6 && npm run copy-wasm-debug",
+    "build-wasm-release-es6": "./tools/build_wasm.sh release es6  && npm run copy-wasm-release",
+    "build-es6": "npm run build-wasm-release-es6 && tsc -p tsconfig.es6.json && cp src/libheif.wasm dist",
+    "clean": "rm -rf build dist src/libheif.js src/libheif.wasm",
     "test": "jest",
-    "prepublishOnly": "npm run clean && npm run dev-debug && npm test && npm run clean && npm run build",
+    "prepublishOnly": "npm run clean && npm run build-wasm-debug && npm test && npm run clean && npm run build-es6",
     "demo": "npm run build-es6 && cp dist/index.js dist/libheif.js dist/libheif.wasm demo"
   },
   "keywords": [
