@@ -1,7 +1,6 @@
 import init, {
   heif_context,
   heif_error,
-  heif_image,
   heif_item_id,
   libheif,
 } from "./libheif.js";
@@ -30,16 +29,16 @@ export class HeifDecoder {
     if (!HeifDecoder.promise) {
       HeifDecoder.promise = init();
     }
-    const libheif = await HeifDecoder.promise;
-    const ctx = libheif.heif_context_alloc();
-    const error = libheif.heif_context_read_from_memory(ctx, buffer);
-    if (error.code != libheif.heif_error_code.heif_error_Ok) {
-      throw new Error(libheif.heif_error_code[error.code]);
+    const lib = await HeifDecoder.promise;
+    const ctx = lib.heif_context_alloc();
+    const error = lib.heif_context_read_from_memory(ctx, buffer);
+    if (error.code != lib.heif_error_code.heif_error_Ok) {
+      throw new Error(lib.heif_error_code[error.code]);
     }
-    return new HeifDecoder(libheif, ctx);
+    return new HeifDecoder(lib, ctx);
   }
 
-  private constructor(private libheif: libheif, private ctx: heif_context) {}
+  private constructor(private lib: libheif, private ctx: heif_context) {}
 
   /**
    * Returns the number of images.
@@ -49,7 +48,7 @@ export class HeifDecoder {
    */
   getNumberOfImages(): number {
     this.checkReleased();
-    return this.libheif.heif_context_get_number_of_top_level_images(this.ctx);
+    return this.lib.heif_context_get_number_of_top_level_images(this.ctx);
   }
 
   /**
@@ -62,7 +61,7 @@ export class HeifDecoder {
   decodeImage(index: number): HeifImage {
     this.checkReleased();
     const items = this.checkHeifError(
-      this.libheif.heif_js_context_get_list_of_top_level_image_IDs(this.ctx)
+      this.lib.heif_js_context_get_list_of_top_level_image_IDs(this.ctx)
     );
     const id = items[index];
     if (!id) {
@@ -80,16 +79,16 @@ export class HeifDecoder {
   decodeAllImages(): HeifImage[] {
     this.checkReleased();
     return this.checkHeifError(
-      this.libheif.heif_js_context_get_list_of_top_level_image_IDs(this.ctx)
+      this.lib.heif_js_context_get_list_of_top_level_image_IDs(this.ctx)
     ).map((id) => this.decode(id));
   }
 
   private decode(id: heif_item_id): HeifImage {
     const handle = this.checkHeifError(
-      this.libheif.heif_js_context_get_image_handle(this.ctx, id)
+      this.lib.heif_js_context_get_image_handle(this.ctx, id)
     );
     const image = this.checkHeifError(
-      this.libheif.heif_js_decode_image_rgba(handle)
+      this.lib.heif_js_decode_image_rgba(handle)
     );
     const heifImage = {
       width: image.width,
@@ -101,8 +100,8 @@ export class HeifDecoder {
         image.stride
       ),
     };
-    this.libheif.heif_image_release(image.ptr);
-    this.libheif.heif_image_handle_release(handle);
+    this.lib.heif_image_release(image.ptr);
+    this.lib.heif_image_handle_release(handle);
     return heifImage;
   }
 
@@ -132,21 +131,21 @@ export class HeifDecoder {
    * The decoder can't be used anmore.
    */
   release() {
-    this.libheif.heif_context_free(this.ctx);
+    this.lib.heif_context_free(this.ctx);
     // Avoid invoking wasm later.
-    (this.libheif as any) = undefined;
+    (this.lib as any) = undefined;
     (this.ctx as any) = undefined;
   }
 
   private checkReleased() {
-    if (!this.libheif || !this.ctx) {
+    if (!this.lib || !this.ctx) {
       throw new Error("This decoder is released.");
     }
   }
 
   private checkHeifError<Type>(x: Type | heif_error): Type {
     if (this.isHeifError(x)) {
-      throw new Error(this.libheif.heif_error_code[x.code]);
+      throw new Error(this.lib.heif_error_code[x.code]);
     }
     return x;
   }
