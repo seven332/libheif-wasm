@@ -16,18 +16,16 @@ LIBHEIF_BUILD_DIR="${BUILD_DIR}/libheif"
 
 if [ $BUILD_TYPE == "debug" ]; then
     CMAKE_BUILD_TYPE="Debug"
-    LINK_OPTIMIZATIONS=0
+    LINK_FLAGS="-O0 -g3"
 elif [ $BUILD_TYPE == "release" ]; then
     CMAKE_BUILD_TYPE="Release"
-    LINK_OPTIMIZATIONS=3
+    LINK_FLAGS="-O3 -g0"
 else
     echo "Unknown build type: ${BUILD_TYPE}"
 fi
 
 if [ "$2" == "es6" ]; then
-    LINK_ES6="-sEXPORT_ES6"
-else
-    LINK_ES6=""
+    LINK_FLAGS="${LINK_FLAGS} -sEXPORT_ES6"
 fi
 
 # Build libde265
@@ -64,6 +62,5 @@ emcc -Wl,--whole-archive ${LIBHEIF_BUILD_DIR}/libheif/libheif.a -Wl,--no-whole-a
     -sMAXIMUM_MEMORY=512MB \
     -sDISABLE_EXCEPTION_CATCHING=1 \
     -sMODULARIZE \
-    ${LINK_ES6} \
-    -O${LINK_OPTIMIZATIONS} \
+    ${LINK_FLAGS} \
     -o ${BUILD_DIR}/libheif.js
