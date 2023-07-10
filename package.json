@@ -1,6 +1,6 @@
 {
   "name": "@seven332/libheif-wasm",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A WebAssembly implementation of heif decoder",
   "homepage": "https://github.com/seven332/libheif-wasm",
   "repository": {
