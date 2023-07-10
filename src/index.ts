@@ -11,8 +11,19 @@ export interface HeifImage {
   data: Uint8Array;
 }
 
-export class HeifDecoder {
-  private static promise: Promise<libheif> | undefined;
+export class HeifWasm {
+  /**
+   * Load libheif wasm.
+   *
+   * @param locateFile the wasm path
+   * @returns the wasm
+   */
+  static async load(locateFile?: (url: string, scriptDirectory: string) => string) {
+    const lib = await init({locateFile: locateFile})
+    return new HeifWasm(lib)
+  }
+
+  private constructor(private lib: libheif) {}
 
   /**
    * Creates a heif decoder from buffer.
@@ -23,22 +34,18 @@ export class HeifDecoder {
    * @returns the buffer to decode the heif file
    * @throws if it's not a heif file
    */
-  static async from(
-    buffer: ArrayBuffer | Uint8Array | Uint8ClampedArray | Int8Array
-  ): Promise<HeifDecoder> {
-    if (!HeifDecoder.promise) {
-      HeifDecoder.promise = init();
+  decoder(buffer: ArrayBuffer | Uint8Array | Uint8ClampedArray | Int8Array): HeifDecoder {
+    const ctx = this.lib.heif_context_alloc();
+    const error = this.lib.heif_context_read_from_memory(ctx, buffer);
+    if (error.code != this.lib.heif_error_code.heif_error_Ok) {
+      throw new Error(this.lib.heif_error_code[error.code]);
     }
-    const lib = await HeifDecoder.promise;
-    const ctx = lib.heif_context_alloc();
-    const error = lib.heif_context_read_from_memory(ctx, buffer);
-    if (error.code != lib.heif_error_code.heif_error_Ok) {
-      throw new Error(lib.heif_error_code[error.code]);
-    }
-    return new HeifDecoder(lib, ctx);
+    return new HeifDecoder(this.lib, ctx);
   }
+}
 
-  private constructor(private lib: libheif, private ctx: heif_context) {}
+export class HeifDecoder {
+  constructor(private lib: libheif, private ctx: heif_context) {}
 
   /**
    * Returns the number of images.

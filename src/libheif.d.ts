@@ -1,4 +1,6 @@
-export default function init(): Promise<libheif>;
+export default function init(options?: {
+  locateFile?: (url: string, scriptDirectory: string) => string;
+}): Promise<libheif>;
 
 export enum heif_error_code {
   heif_error_Ok = 0,

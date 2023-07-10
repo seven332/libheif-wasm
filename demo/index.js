@@ -8,7 +8,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import init from "./libheif.js";
-export class HeifDecoder {
+export class HeifWasm {
+    /**
+     * Load libheif wasm.
+     *
+     * @param locateFile the wasm path
+     * @returns the wasm
+     */
+    static load(locateFile) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const lib = yield init({ locateFile: locateFile });
+            return new HeifWasm(lib);
+        });
+    }
+    constructor(lib) {
+        this.lib = lib;
+    }
     /**
      * Creates a heif decoder from buffer.
      * Remember invoking `release` if you don't need
@@ -18,20 +33,16 @@ export class HeifDecoder {
      * @returns the buffer to decode the heif file
      * @throws if it's not a heif file
      */
-    static from(buffer) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!HeifDecoder.promise) {
-                HeifDecoder.promise = init();
-            }
-            const lib = yield HeifDecoder.promise;
-            const ctx = lib.heif_context_alloc();
-            const error = lib.heif_context_read_from_memory(ctx, buffer);
-            if (error.code != lib.heif_error_code.heif_error_Ok) {
-                throw new Error(lib.heif_error_code[error.code]);
-            }
-            return new HeifDecoder(lib, ctx);
-        });
+    decoder(buffer) {
+        const ctx = this.lib.heif_context_alloc();
+        const error = this.lib.heif_context_read_from_memory(ctx, buffer);
+        if (error.code != this.lib.heif_error_code.heif_error_Ok) {
+            throw new Error(this.lib.heif_error_code[error.code]);
+        }
+        return new HeifDecoder(this.lib, ctx);
     }
+}
+export class HeifDecoder {
     constructor(lib, ctx) {
         this.lib = lib;
         this.ctx = ctx;

@@ -1,12 +1,13 @@
 import { describe, expect, it } from "@jest/globals";
 import fs from "fs";
-import { HeifDecoder, HeifImage } from "./index";
+import { HeifDecoder, HeifImage, HeifWasm } from "./index";
 
 describe("avif-sample-images.test", () => {
   async function decode(file: string): Promise<HeifImage> {
     const buffer = fs.readFileSync(`third_party/avif-sample-images/${file}`);
-    const decoder = await HeifDecoder.from(buffer);
-    expect(decoder.getNumberOfImages()).toBe(1)
+    const wasm = await HeifWasm.load();
+    const decoder = wasm.decoder(buffer);
+    expect(decoder.getNumberOfImages()).toBe(1);
     return decoder.decodeImage(0);
   }
 

@@ -14,7 +14,7 @@
     />
     <div id="container"></div>
     <script type="module">
-      import { HeifDecoder } from "./index.js";
+      import { HeifWasm } from "./index.js";
       /** @type {HTMLDivElement} */
       const container = document.getElementById("container");
       /** @type {HTMLInputElement} */
@@ -27,7 +27,8 @@
         const file = input.files[0];
         const buffer = await file.arrayBuffer();
         try {
-          const decoder = await HeifDecoder.from(buffer);
+          const wasm = await HeifWasm.load();
+          const decoder = wasm.decoder(buffer);
           const images = decoder.decodeAllImages();
           decoder.release();
           for (const image of images) {
@@ -44,6 +45,7 @@
           const error = document.createElement("label");
           error.innerHTML = e.message;
           container.appendChild(error);
+          throw e
         }
       });
     </script>
