@@ -3,6 +3,7 @@
     "declaration": true,
     "outDir": "dist",
     "strict": true,
+    "allowJs": true,
     "esModuleInterop": true
   },
   "include": ["src/**/*"],

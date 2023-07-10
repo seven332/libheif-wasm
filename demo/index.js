@@ -23,17 +23,17 @@ export class HeifDecoder {
             if (!HeifDecoder.promise) {
                 HeifDecoder.promise = init();
             }
-            const libheif = yield HeifDecoder.promise;
-            const ctx = libheif.heif_context_alloc();
-            const error = libheif.heif_context_read_from_memory(ctx, buffer);
-            if (error.code != libheif.heif_error_code.heif_error_Ok) {
-                throw new Error(libheif.heif_error_code[error.code]);
+            const lib = yield HeifDecoder.promise;
+            const ctx = lib.heif_context_alloc();
+            const error = lib.heif_context_read_from_memory(ctx, buffer);
+            if (error.code != lib.heif_error_code.heif_error_Ok) {
+                throw new Error(lib.heif_error_code[error.code]);
             }
-            return new HeifDecoder(libheif, ctx);
+            return new HeifDecoder(lib, ctx);
         });
     }
-    constructor(libheif, ctx) {
-        this.libheif = libheif;
+    constructor(lib, ctx) {
+        this.lib = lib;
         this.ctx = ctx;
     }
     /**
@@ -44,7 +44,7 @@ export class HeifDecoder {
      */
     getNumberOfImages() {
         this.checkReleased();
-        return this.libheif.heif_context_get_number_of_top_level_images(this.ctx);
+        return this.lib.heif_context_get_number_of_top_level_images(this.ctx);
     }
     /**
      * Returns the image at the index.
@@ -55,7 +55,7 @@ export class HeifDecoder {
      */
     decodeImage(index) {
         this.checkReleased();
-        const items = this.checkHeifError(this.libheif.heif_js_context_get_list_of_top_level_image_IDs(this.ctx));
+        const items = this.checkHeifError(this.lib.heif_js_context_get_list_of_top_level_image_IDs(this.ctx));
         const id = items[index];
         if (!id) {
             throw new Error(`Only ${items.length} images but the index is ${index}`);
@@ -70,18 +70,18 @@ export class HeifDecoder {
      */
     decodeAllImages() {
         this.checkReleased();
-        return this.checkHeifError(this.libheif.heif_js_context_get_list_of_top_level_image_IDs(this.ctx)).map((id) => this.decode(id));
+        return this.checkHeifError(this.lib.heif_js_context_get_list_of_top_level_image_IDs(this.ctx)).map((id) => this.decode(id));
     }
     decode(id) {
-        const handle = this.checkHeifError(this.libheif.heif_js_context_get_image_handle(this.ctx, id));
-        const image = this.checkHeifError(this.libheif.heif_js_decode_image_rgba(handle));
+        const handle = this.checkHeifError(this.lib.heif_js_context_get_image_handle(this.ctx, id));
+        const image = this.checkHeifError(this.lib.heif_js_decode_image_rgba(handle));
         const heifImage = {
             width: image.width,
             height: image.height,
             data: this.stridedCopy(image.plane, image.width * 4, image.height, image.stride),
         };
-        this.libheif.heif_image_release(image.ptr);
-        this.libheif.heif_image_handle_release(handle);
+        this.lib.heif_image_release(image.ptr);
+        this.lib.heif_image_handle_release(handle);
         return heifImage;
     }
     stridedCopy(src, width, height, stride) {
@@ -105,19 +105,19 @@ export class HeifDecoder {
      * The decoder can't be used anmore.
      */
     release() {
-        this.libheif.heif_context_free(this.ctx);
+        this.lib.heif_context_free(this.ctx);
         // Avoid invoking wasm later.
-        this.libheif = undefined;
+        this.lib = undefined;
         this.ctx = undefined;
     }
     checkReleased() {
-        if (!this.libheif || !this.ctx) {
+        if (!this.lib || !this.ctx) {
             throw new Error("This decoder is released.");
         }
     }
     checkHeifError(x) {
         if (this.isHeifError(x)) {
-            throw new Error(this.libheif.heif_error_code[x.code]);
+            throw new Error(this.lib.heif_error_code[x.code]);
         }
         return x;
     }
