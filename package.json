@@ -20,10 +20,11 @@
     "build-wasm-release": "./tools/build_wasm.sh release && npm run copy-wasm-release",
     "build-wasm-debug-es6": "./tools/build_wasm.sh debug es6 && npm run copy-wasm-debug",
     "build-wasm-release-es6": "./tools/build_wasm.sh release es6  && npm run copy-wasm-release",
+    "build": "npm run build-wasm-release && tsc && cp src/libheif.wasm dist",
     "build-es6": "npm run build-wasm-release-es6 && tsc -p tsconfig.es6.json && cp src/libheif.wasm dist",
     "clean": "rm -rf build dist src/libheif.js src/libheif.wasm",
     "test": "jest",
-    "prepublishOnly": "npm run clean && npm run build-wasm-debug && npm test && npm run clean && npm run build-es6",
+    "prepublishOnly": "npm run clean && npm run build-wasm-debug && npm test && npm run clean && npm run build",
     "demo": "npm run build-es6 && cp dist/index.js dist/libheif.js dist/libheif.wasm demo"
   },
   "keywords": [
