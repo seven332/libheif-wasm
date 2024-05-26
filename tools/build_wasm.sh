@@ -60,6 +60,7 @@ emcc -Wl,--whole-archive ${LIBHEIF_BUILD_DIR}/libheif/libheif.a -Wl,--no-whole-a
     --bind \
     -sALLOW_MEMORY_GROWTH=1 \
     -sMAXIMUM_MEMORY=512MB \
+    -sSTACK_SIZE=1MB \
     -sDISABLE_EXCEPTION_CATCHING=1 \
     -sMODULARIZE \
     ${LINK_FLAGS} \
